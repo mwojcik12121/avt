@@ -1,11 +1,12 @@
 import src.objects.CheckBoxTree as cbt
 from tkinter import *
 from tkinter import ttk
+from tkinter import messagebox
 import src.importer as importer
 
 def initializeTestSelectionWindow(window):
     window.title('AVT - Test selection')
-    window.geometry('800x600')
+    window.geometry('820x550')
 
     left = ttk.Frame(window, padding=10, border=20)
     right = ttk.Frame(window, padding=10, border=20)
@@ -25,7 +26,7 @@ def initializeTestSelectionWindow(window):
     idacc = Checkbutton(left, text="Include identification accuracy").grid(column=0, row=3, sticky=W)
     rmacc = Checkbutton(left, text="Include neutralization accuracy").grid(column=0, row=4, sticky=W)
     
-    add = Button(left, text="Add test", command=window.destroy, width=30, height=2).grid(column=0, row=5)
+    add = Button(left, text="Add test", command=refreshTestList(left), width=30, height=2).grid(column=0, row=5)
     ref = Button(left, text="Refresh list", command=refreshTestList(left), width=30, height=2).grid(column=0, row=6)
     test = Button(left, text="Start testing", command=window.destroy, width=30, height=2).grid(column=0, row=7)
 
@@ -36,6 +37,9 @@ def initializeTestSelectionWindow(window):
     description.insert(END, "ID: 0033\n")
     description.insert(END, "Type: Spyware\n\n")
     description.insert(END, "This is a test file of a spyware attack. Here you would find a brief description of a selected test")
+
+    window.option_add('*Dialog.msg.font', 'TkFixedFont 11')
+    messagebox.showinfo(title="Test completed", message="All tests have been completed.\n\nResults have been saved to test_20231206_000001.log", default=messagebox.OK, parent=window)
 
 # refresh test list based on current "testfiles" folder contents
 def refreshTestList(window):

@@ -1,8 +1,8 @@
 #include <iostream>
 #include <list>
-#include <memory>
 
-#include "src/Test.hpp"
+#include "Preprocessor.hpp"
+#include "Tester.hpp"
 
 /**
  * Przyjmowane argumenty:
@@ -14,12 +14,11 @@
 
 int main(int argc, char *argv[])
 {
-    std::list<std::shared_ptr<Test>> tests;
+    std::unique_ptr<Preprocessor> prep = std::make_unique<Preprocessor>(argv[0]);
+    std::unique_ptr<Tester> tester = std::make_unique<Tester>(argv[1], argv[2]);
     
-    for(int i = 3; i < argc; i++)
-    {
-        tests.push_back(std::make_shared<Test>(argv[0], argv[1], argv[2], argv[i]));
-    }
+    std::list<Test> tests = prep->prepareTests();
+    tester->performTests(tests);
     
     return 0;
 }

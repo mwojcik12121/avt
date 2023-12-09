@@ -2,17 +2,20 @@
 
 #include <string>
 
+#include "TestInfo.hpp"
 class Test
 {
-    std::string fullpath = "";
-    std::string executable = "";
-
-    
-    void importTest(std::string path, bool doPerfTest, bool doPrecTest, std::string file);
+    std::string id = "";
+    std::list<unsigned> code;
+    std::list<StageMap> stageinfo;
 
 public:
-    Test(std::string path, bool doPerfTest, bool doPrecTest, std::string file);
+    Test(std::string id, std::list<unsigned> code, std::list<StageMap> stageinfo);
     ~Test();
 
-    void performTest();
+    int executeTest(const bool doPerf, const bool doAcc);
+
+    std::string getId();
+    std::list<unsigned> getCode();
+    std::list<StageMap> getStageInfo();
 };
