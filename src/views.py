@@ -39,7 +39,7 @@ def initializeTestSelectionWindow(window):
     description.insert(END, "This is a test file of a spyware attack. Here you would find a brief description of a selected test")
 
     window.option_add('*Dialog.msg.font', 'TkFixedFont 11')
-    messagebox.showinfo(title="Test completed", message="All tests have been completed.\n\nResults have been saved to test_20231206_000001.log", default=messagebox.OK, parent=window)
+    messagebox.showinfo(title="Test completed", message="All tests have been completed.\n\nLog have been saved to test_20231206_000001.log", default=messagebox.OK, parent=window)
 
 # refresh test list based on current "testfiles" folder contents
 def refreshTestList(window):

@@ -1,35 +1,46 @@
-
-
+#include "Common.hpp"
 #include "Test.hpp"
 
-Test::Test(std::string id, std::list<unsigned> code, std::list<StageMap> stageinfo)
+Test::Test(std::string id, std::string type, std::list<avt::StageMap> stageinfo)
 {
     id = id;
-    code = code;
+    type = type;
     stageinfo = stageinfo;
 }
 
-Test::~Test()
+void Test::executeTest(const bool doPerf, const bool doAcc, avt::AVType avtype)
 {
+    avt::stopwatch::time_point begin;
+    avt::stopwatch::time_point end;
 
-}
-
-std::string Test::getId()
-{
-    return id;
-}
-
-std::list<unsigned> Test::getCode()
-{
-    return code;
-}
-
-std::list<StageMap> Test::getStageInfo()
-{
-    return stageinfo;
-}
-
-int Test::executeTest(const bool doPerf, const bool doAcc)
-{
+    if(doPerf) begin = avt::stopwatch::now();
     
+    std::string testdir = "./workspace/" + id;
+    result.nstage = system(testdir.c_str());
+
+    if(doPerf)
+    {
+        end = avt::stopwatch::now();
+        result.elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+    }
+
+    verifyAVLog(avtype);
+}
+
+void Test::verifyAVLog(avt::AVType avtype)
+{
+    switch(avtype)
+    {
+        case avt::AVType::ClamAV:
+            break;
+        case avt::AVType::Comodo:
+            break;
+        case avt::AVType::DrWeb:
+            break;
+        case avt::AVType::Sophos:
+            break;
+        default:
+            result.detected = "N/A";
+            break;
+    }
 }

@@ -1,13 +1,11 @@
 #pragma once
 
-#include <iostream>
+#include <string>
 
-#include "Preprocessor.hpp"
-
-class Results
+struct Results
 {
-    void addEntry(std::string entry);
-    void printToLog();
-
-    
+    int nstage = -1;
+    std::string stagedesc = "";
+    int elapsed = -1;
+    std::string detected = "";
 };

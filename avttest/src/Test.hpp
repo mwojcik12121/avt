@@ -1,21 +1,29 @@
 #pragma once
 
+#include <list>
 #include <string>
 
-#include "TestInfo.hpp"
+#include "Common.hpp"
+#include "Results.hpp"
+
 class Test
 {
     std::string id = "";
-    std::list<unsigned> code;
-    std::list<StageMap> stageinfo;
+    std::string type = "";
+    std::list<avt::StageMap> stageinfo;
+    Results result;
+
+    void verifyAVLog(avt::AVType avtype);
 
 public:
-    Test(std::string id, std::list<unsigned> code, std::list<StageMap> stageinfo);
-    ~Test();
+    Test() = default;
+    Test(std::string id, std::string type, std::list<avt::StageMap> stageinfo);
+    ~Test() = default;
 
-    int executeTest(const bool doPerf, const bool doAcc);
+    void executeTest(const bool doPerf, const bool doAcc, avt::AVType avtype);
 
-    std::string getId();
-    std::list<unsigned> getCode();
-    std::list<StageMap> getStageInfo();
+    std::string getId() { return id; }
+    std::string getType() { return type; }
+    std::list<avt::StageMap>& getStageInfo() { return stageinfo; }
+    Results getResult() { return result; }
 };

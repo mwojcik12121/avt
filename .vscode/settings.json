@@ -65,6 +65,7 @@
         "xlocmon": "cpp",
         "xloctime": "cpp",
         "xtree": "cpp",
-        "regex": "cpp"
+        "regex": "cpp",
+        "fstream": "cpp"
     }
 }
