@@ -7,15 +7,18 @@
 #include "Common.hpp"
 #include "Log.hpp"
 
+using clock = std::chrono::system_clock;
+
 Log::Log()
 {
     path = std::filesystem::current_path().string() + generateLogName();
     addEntry("### AVT TEST CASE ###");
+    addEntry("");
 }
 
 std::string Log::getTimestamp()
 {
-    std::chrono::time_point<avt::clock> datetime = avt::clock::now();
+    std::chrono::time_point<clock> datetime = clock::now();
     return std::format("[ %Y-%m-%d %H:%M:%S ] ", datetime);
 }
 
@@ -31,10 +34,16 @@ void Log::addSummary(Test &test)
     Results res = test.getResult();
     
     addEntry(std::string("Test: "+test.getId()));
-    addEntry(std::string("Status: "+res.nstage==0?"FAILED":"SUCCESS"));
-    addEntry(std::string("Elapsed time: "+res.elapsed>0?std::to_string(res.elapsed):"N/A"));
-    addEntry(std::string("Threat (expected): "+test.getType()));
-    addEntry(std::string("Threat (detected): "+test.getType()!=""?test.getType():"N/A"));
+    if(res.nstage != 0)
+    {
+        addEntry(std::string("Status: SUCCESS"));
+        addEntry(std::string("Elapsed time: "+res.elapsed>0?std::to_string(res.elapsed):"N/A"));
+        addEntry(std::string("Threat (expected): "+test.getType()));
+        addEntry(std::string("Threat (detected): "+test.getType()!=""?test.getType():"N/A"));
+    }
+    else addEntry(std::string("Status: FAILED"));
+
+    addEntry("");
 }
 
 void Log::addBriefSummary(std::list<Test> &tests)
@@ -65,7 +74,7 @@ std::string Log::generateLogName()
 {
     std::string filename = "/logs/test_";
 
-    std::chrono::time_point<avt::clock> datetime = avt::clock::now();
+    std::chrono::time_point<clock> datetime = clock::now();
     filename += std::format("%Y%m%d%H%M%S", datetime);
 
     return filename + ".log";

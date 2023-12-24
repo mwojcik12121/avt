@@ -10,9 +10,8 @@ class Preprocessor
     std::string directory;
 
     bool importTest(std::string file, Test &test);
-    void unpackTar(std::string file);
+    void unpackTar(std::string filepath);
     bool validateLine(int index, std::string line);
-    avt::StageMap createMapEntry(std::string line);
 
 public:
     Preprocessor() = default;
@@ -20,4 +19,5 @@ public:
     ~Preprocessor() = default;
 
     std::list<Test> prepareTests(std::list<std::string> &testnames);
+    std::shared_ptr<AVType> getAVType();
 };

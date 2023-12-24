@@ -1,9 +1,8 @@
-#include <thread>
-#include <vector>
+#include <filesystem>
 
 #include "Tester.hpp"
 
-Tester::Tester(std::string perftest, std::string acctest)
+Tester::Tester(std::string perftest, std::string acctest, std::shared_ptr<AVType> av)
 {
     if(perftest != "0" || perftest != "1")
         throw("Incorrect parameter for: doPerformanceTest");
@@ -14,13 +13,12 @@ Tester::Tester(std::string perftest, std::string acctest)
     do_acctest = std::stoi(acctest);
     do_perftest = std::stoi(perftest);
     log = Log();
+    avtype = av;
 }
 
 void Tester::performTests(std::list<Test>& tests)
 {
-    log.addEntry("Testing has begun!");
-    log.addEntry("");
-    log.addEntry("Activating tests...!");
+    log.addEntry("Activating tests...");
     log.addEntry("");
     log.addEntry("");
     
@@ -29,9 +27,14 @@ void Tester::performTests(std::list<Test>& tests)
         log.addEntry(std::string("Test " + it.getId() + " in progress..."));
         it.executeTest(do_perftest, do_acctest, avtype);
         log.addEntry(std::string("Test " + it.getId() + " has been completed."));
+        log.addEntry("");
         log.addSummary(it);
+        log.addEntry("");
     }
 
+    log.addEntry("");
+    log.addEntry("");
+    log.addEntry("");
     log.addBriefSummary(tests);
     log.printToLog();
 }

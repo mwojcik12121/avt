@@ -9,18 +9,16 @@
 class Tester
 {
     Log log;
-    avt::AVType avtype = avt::AVType::None;
+    std::shared_ptr<AVType> avtype;
 
     bool do_perftest = false;
     bool do_acctest = false;
 
     std::string testdir;
-
-    bool verifyAVLogs(std::string expected);
     
 public:
     Tester() = default;
-    Tester(std::string perftest, std::string acctest);
+    Tester(std::string perftest, std::string acctest, std::shared_ptr<AVType> av);
     ~Tester() = default;
 
     void performTests(std::list<Test>& tests);

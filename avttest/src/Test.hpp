@@ -3,27 +3,23 @@
 #include <list>
 #include <string>
 
-#include "Common.hpp"
+#include "AVType.hpp"
 #include "Results.hpp"
 
 class Test
 {
     std::string id = "";
     std::string type = "";
-    std::list<avt::StageMap> stageinfo;
     Results result;
-
-    void verifyAVLog(avt::AVType avtype);
 
 public:
     Test() = default;
-    Test(std::string id, std::string type, std::list<avt::StageMap> stageinfo);
+    Test(std::string id, std::string type);
     ~Test() = default;
 
-    void executeTest(const bool doPerf, const bool doAcc, avt::AVType avtype);
+    void executeTest(const bool doPerf, const bool doAcc, std::shared_ptr<AVType> avtype);
 
     std::string getId() { return id; }
     std::string getType() { return type; }
-    std::list<avt::StageMap>& getStageInfo() { return stageinfo; }
     Results getResult() { return result; }
 };
