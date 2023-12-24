@@ -23,7 +23,7 @@ std::list<Test> Preprocessor::prepareTests(std::list<std::string> &testnames)
         if(std::find(testnames.begin(), testnames.end(), testfile) != testnames.end() &&
             std::regex_match(testfile, std::regex("[A-Z]{2}-[0-9]{4}.tar")))
         {
-            unpackTar(testfile);
+            unpackTarInfo(testfile);
 
             if(std::filesystem::exists(std::string(".workspace/" + filename)) &&
                 std::filesystem::exists(std::string(".workspace/" + filename + ".info")))
@@ -78,12 +78,14 @@ bool Preprocessor::importTest(std::string file, Test &test)
     return true;
 }
 
-void Preprocessor::unpackTar(std::string filepath)
+void Preprocessor::unpackTarInfo(std::string filepath)
 {
-    if(!std::filesystem::is_directory(std::string(std::filesystem::current_path().string()+"/workspace")))
+    if(!std::filesystem::is_directory(std::string(std::filesystem::current_path().string()+"/.workspace")))
         system("mkdir .workspace");
 
-    std::string cmd = "tar -xvf " + filepath + " -C .workspace";
+    std::filesystem::path file = std::filesystem::path(filepath);
+
+    std::string cmd = "tar -xvf " + filepath + " -C .workspace " + file.stem().string() + ".info";
     system(cmd.c_str());
 }
 
@@ -99,5 +101,50 @@ bool Preprocessor::validateLine(int index, std::string line)
             break;
         default:
             break;
+    }
+}
+
+std::shared_ptr<AVType> Preprocessor::getAVType()
+{
+    bool av[3] = {0};
+    int av_count = 0;
+
+    if(std::filesystem::exists("/var/log/clamav/clamav.log"))
+    {
+        av[0] = 1;
+    }
+    if(std::filesystem::exists(""))
+    {
+        av[1] = 1;
+    }
+    if(std::filesystem::exists("/opt/sophos-av/log/savd.log"))
+    {
+        av[2] = 1;
+    }
+    
+    for(int i=0; i<3; i++) if(av[i]) av_count++;
+
+    if(av_count > 1) throw("More than one antivirus software detected! Please, make sure all additional antivirus software and its logs are deleted from your device");
+    else if(av_count < 1) throw("No compatible antivirus software detected!");
+    else
+    {
+        std::shared_ptr<AVType> avtype;
+
+        if(av[0])
+        {
+            avtype = std::make_shared<ClamAV>();
+            avtype->logpath = "workspace/clamav.log";
+        }
+        else if(av[1])
+        {
+            avtype = std::make_shared<DrWeb>();
+            avtype->logpath = "";
+        }
+        else if(av[2])
+        {
+            avtype = std::make_shared<Sophos>();
+            avtype->logpath = "/opt/sophos-av/log/savd.log";
+        }
+        return avtype;
     }
 }

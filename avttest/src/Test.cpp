@@ -1,4 +1,5 @@
 #include <chrono>
+#include <filesystem>
 
 #include "Test.hpp"
 
@@ -16,13 +17,21 @@ void Test::executeTest(const bool doPerf, const bool doAcc, std::shared_ptr<AVTy
     stopwatch::time_point end;
 
     if(doPerf) begin = stopwatch::now();
+
+    unpackTarCode(std::string(std::filesystem::current_path().string()+"/testfiles/" + id));
     
     std::string testdir = "/workspace/" + id;
-    result.nstage = system(testdir.c_str());
+    result.status = system(testdir.c_str());
 
     if(doPerf)
     {
         end = stopwatch::now();
         result.elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
     }
+}
+
+void Test::unpackTarCode(std::string filepath)
+{
+    std::string cmd = "tar -xvf " + filepath + " -C .workspace " + std::filesystem::path(filepath).stem().string();
+    system(cmd.c_str());
 }

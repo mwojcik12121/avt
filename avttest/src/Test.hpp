@@ -12,6 +12,8 @@ class Test
     std::string type = "";
     Results result;
 
+    void unpackTarCode(std::string filepath);
+
 public:
     Test() = default;
     Test(std::string id, std::string type);

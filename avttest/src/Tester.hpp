@@ -13,8 +13,6 @@ class Tester
 
     bool do_perftest = false;
     bool do_acctest = false;
-
-    std::string testdir;
     
 public:
     Tester() = default;

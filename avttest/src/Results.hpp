@@ -4,8 +4,7 @@
 
 struct Results
 {
-    int nstage = -1;
-    std::string stagedesc = "";
+    int status = -1;
     int elapsed = -1;
     std::string detected = "";
 };

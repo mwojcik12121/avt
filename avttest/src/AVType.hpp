@@ -2,44 +2,28 @@
 
 #include <string>
 
-class AVType
+struct AVType
 {
     std::string logpath;
 
-public:
-    AVType(std::string lp) {logpath = lp;};
-    ~AVType() = default;
-
-    virtual int executeTest(std::string testfile) {}
-    virtual std::string verifyAVLog() {}
+    virtual int executeTest(std::string testfile);
+    virtual std::string verifyAVLog();
 };
 
-class ClamAV : public AVType
+struct ClamAV : AVType
 {
-public:
-    ClamAV(std::string lp) : AVType(lp) {}
-    ~ClamAV() = default;
-
     int executeTest(std::string testfile) override;
     std::string verifyAVLog() override;
 };
 
-class DrWeb : public AVType
+struct DrWeb : AVType
 {
-public:
-    DrWeb(std::string lp) : AVType(lp) {}
-    ~DrWeb() = default;
-
     int executeTest(std::string testfile) override;
     std::string verifyAVLog() override;
 };
 
-class Sophos : public AVType
+struct Sophos : AVType
 {
-public:
-    Sophos(std::string lp) : AVType(lp) {}
-    ~Sophos() = default;
-
     int executeTest(std::string testfile) override;
     std::string verifyAVLog() override;
 };

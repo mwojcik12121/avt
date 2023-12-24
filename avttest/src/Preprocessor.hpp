@@ -10,7 +10,7 @@ class Preprocessor
     std::string directory;
 
     bool importTest(std::string file, Test &test);
-    void unpackTar(std::string filepath);
+    void unpackTarInfo(std::string filepath);
     bool validateLine(int index, std::string line);
 
 public:

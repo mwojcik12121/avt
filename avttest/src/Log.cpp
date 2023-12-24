@@ -4,7 +4,6 @@
 #include <fstream>
 #include <iostream>
 
-#include "Common.hpp"
 #include "Log.hpp"
 
 using clock = std::chrono::system_clock;
@@ -34,12 +33,11 @@ void Log::addSummary(Test &test)
     Results res = test.getResult();
     
     addEntry(std::string("Test: "+test.getId()));
-    if(res.nstage != 0)
+    if(res.status != 0)
     {
         addEntry(std::string("Status: SUCCESS"));
-        addEntry(std::string("Elapsed time: "+res.elapsed>0?std::to_string(res.elapsed):"N/A"));
-        addEntry(std::string("Threat (expected): "+test.getType()));
-        addEntry(std::string("Threat (detected): "+test.getType()!=""?test.getType():"N/A"));
+        addEntry(std::string("Elapsed time: " + res.elapsed > 0 ? std::to_string(res.elapsed) : "N/A"));
+        addEntry(std::string("Detected threat: " + res.detected != "" ? res.detected : "N/A"));
     }
     else addEntry(std::string("Status: FAILED"));
 
@@ -57,7 +55,7 @@ void Log::addBriefSummary(std::list<Test> &tests)
     for(auto t : tests)
     {
         res = t.getResult();
-        addEntry(std::string("\t\t"+t.getId()+"("+t.getType()+"): "+(res.nstage==0?"FAILED":"SUCCESS")));
+        addEntry(std::string("\t\t"+t.getId()+"("+t.getType()+"): "+(res.status==0?"FAILED":"SUCCESS")));
         addEntry("");
     }
 }

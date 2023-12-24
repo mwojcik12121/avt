@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
             testnames.emplace_back(argv[i]);
         
         tests = prep.prepareTests(testnames);
-        tester = Tester(argv[1], argv[2], avtype);
+        tester = Tester(argv[0], argv[1], avtype);
     }
     catch(const std::exception& e)
     {
