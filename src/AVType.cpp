@@ -1,33 +1,60 @@
+#include <filesystem>
+#include <fstream>
+
 #include "AVType.hpp"
 
-int ClamAV::executeTest(std::string testfile)
+int ClamAV::executeTest(std::string id)
 {
-    system(std::string("clamscan -l workspace/clamav.log " + testfile).c_str());
+    system(std::string("tar -xvf testfiles/" + id + ".tar -C .workspace " + id).c_str());
+    system(std::string("clamscan --quiet -l" + logpath + " .workspace/" + id).c_str());
+    if(verifyAVLog(std::string(logpath)) != "") return 1;
+    else return 0;
+}
+
+std::string ClamAV::verifyAVLog(std::string testpath)
+{
+    std::ifstream log(logpath, std::ios::in);
+    std::string line;
+
+    while(!log.eof())
+    {
+        log >> line;
+        if(line.find(testpath))
+        {
+            std::istringstream iss(line);
+            std::string token;
+
+            while(iss >> token)
+                if (!token.empty() && token != "FOUND" && !token.find(':'))
+                    return token;
+        }
+    }
+    
+    return "";
+}
+
+int DrWeb::executeTest(std::string id)
+{
+    system(std::string("tar -xvf ./testfiles/" + id + ".tar -C .workspace " + id).c_str());
+    if(!std::filesystem::exists(std::string(std::filesystem::current_path().string()+"/.workspace/" + id))) return 1;
+    else return system(std::string("." + std::string(std::filesystem::current_path().string()+"/.workspace/" + id)).c_str());
     return 0;
 }
 
-std::string ClamAV::verifyAVLog()
+std::string DrWeb::verifyAVLog(std::string testpath)
 {
     return "";
 }
 
-int DrWeb::executeTest(std::string testfile)
+int Sophos::executeTest(std::string id)
 {
+    system(std::string("tar -xvf ./testfiles/" + id + ".tar -C .workspace " + id).c_str());
+    if(!std::filesystem::exists(std::string(std::filesystem::current_path().string()+"/.workspace/" + id))) return 1;
+    else return system(std::string("." + std::string(std::filesystem::current_path().string()+"/.workspace/" + id)).c_str());
     return 0;
 }
 
-std::string DrWeb::verifyAVLog()
-{
-    return "";
-}
-
-int Sophos::executeTest(std::string testfile)
-{
-    int retval = system(std::string("." + testfile).c_str());
-    return 0;
-}
-
-std::string Sophos::verifyAVLog()
+std::string Sophos::verifyAVLog(std::string testpath)
 {
     std::string logline;
     return "";

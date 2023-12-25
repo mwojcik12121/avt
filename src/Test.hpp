@@ -13,11 +13,9 @@ class Test
     std::string type = "";
     Results result;
 
-    void unpackTarCode(std::string filepath);
-
 public:
     Test() = default;
-    Test(std::string id, std::string type);
+    Test(std::string id_t, std::string type_t);
     ~Test() = default;
 
     void executeTest(const bool doPerf, const bool doAcc, std::shared_ptr<AVType> avtype);

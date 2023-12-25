@@ -20,7 +20,7 @@ std::list<Test> Preprocessor::prepareTests(std::list<std::string> &testnames)
         std::string testfile = entry.path().filename().string();
         std::string filename = entry.path().stem().string();
 
-        if(std::find(testnames.begin(), testnames.end(), testfile) != testnames.end() &&
+        if(std::find(testnames.begin(), testnames.end(), filename) != testnames.end() &&
             std::regex_match(testfile, std::regex("[A-Z]{2}-[0-9]{4}.tar")))
         {
             unpackTarInfo(testfile);
@@ -34,7 +34,6 @@ std::list<Test> Preprocessor::prepareTests(std::list<std::string> &testnames)
             }
             else std::cout << testfile << ": Invalid info file format! Test has been skipped.\n";
         }
-        else std::cout << testfile << ": Invalid info file format! Test has been skipped.\n";
     }
 
     if(testlist.empty())
@@ -83,9 +82,7 @@ void Preprocessor::unpackTarInfo(std::string filepath)
         system("mkdir .workspace");
 
     std::filesystem::path file = std::filesystem::path(filepath);
-
-    std::string cmd = "tar -xvf " + filepath + " -C .workspace " + file.stem().string() + ".info";
-    system(cmd.c_str());
+    system(std::string("tar -xvf ./testfiles/" + filepath + " -C .workspace " + file.stem().string() + ".info").c_str());
 }
 
 bool Preprocessor::validateLine(int index, std::string line)
@@ -109,42 +106,31 @@ std::shared_ptr<AVType> Preprocessor::getAVType()
     bool av[3] = {0};
     int av_count = 0;
 
-    if(std::filesystem::exists("/var/log/clamav/clamav.log"))
-    {
-        av[0] = 1;
-    }
-    if(std::filesystem::exists(""))
-    {
-        av[1] = 1;
-    }
-    if(std::filesystem::exists("/opt/sophos-av/log/savd.log"))
-    {
-        av[2] = 1;
-    }
+    if(std::filesystem::exists("/var/log/clamav/clamav.log")) av[0] = 1;
+    if(std::filesystem::exists("")) av[1] = 1;
+    if(std::filesystem::exists("/opt/sophos-av/log/savd.log")) av[2] = 1;
     
     for(int i=0; i<3; i++) if(av[i]) av_count++;
 
     if(av_count > 1) throw std::invalid_argument("\nMore than one antivirus software detected! Please, make sure all additional antivirus software and its logs are deleted from your device");
     else if(av_count < 1) std::invalid_argument("\nNo compatible antivirus software detected!");
-    else
-    {
-        std::shared_ptr<AVType> avtype;
+    
+    std::shared_ptr<AVType> avtype;
 
-        if(av[0])
-        {
-            avtype = std::make_shared<ClamAV>();
-            avtype->logpath = "workspace/clamav.log";
-        }
-        else if(av[1])
-        {
-            avtype = std::make_shared<DrWeb>();
-            avtype->logpath = "";
-        }
-        else if(av[2])
-        {
-            avtype = std::make_shared<Sophos>();
-            avtype->logpath = "/opt/sophos-av/log/savd.log";
-        }
-        return avtype;
+    if(av[0])
+    {
+        avtype = std::make_shared<ClamAV>();
+        avtype->logpath = ".workspace/clamav.log";
     }
+    else if(av[1])
+    {
+        avtype = std::make_shared<DrWeb>();
+        avtype->logpath = "";
+    }
+    else if(av[2])
+    {
+        avtype = std::make_shared<Sophos>();
+        avtype->logpath = "/opt/sophos-av/log/savd.log";
+    }
+    return avtype;
 }

@@ -11,14 +11,14 @@ using clock_c = std::chrono::system_clock;
 Log::Log()
 {
     path = std::filesystem::current_path().string() + generateLogName();
-    addEntry("### AVT TEST CASE ###");
-    addEntry("");
+    addEntry("### AVT TEST CASE ###\n");
+    addEntry("\n");
 }
 
 std::string Log::getTimestamp()
 {
     std::chrono::time_point<clock_c> datetime = clock_c::now();
-    return std::format("[ %Y-%m-%d %H:%M:%S ] ", datetime);
+    return std::format("[ {:%Y-%m-%d %H:%M:%S} ] ", floor<std::chrono::seconds>(datetime));
 }
 
 void Log::addEntry(std::string entry)
@@ -31,36 +31,36 @@ void Log::addSummary(Test &test)
 {
     Results res = test.getResult();
     
-    addEntry(std::string("Test: "+test.getId()));
-    if(res.status != 0)
+    addEntry(std::string("Test: "+test.getId()+"\n"));
+    if(res.status == 1)
     {
-        addEntry(std::string("Status: SUCCESS"));
-        addEntry(std::string("Elapsed time: " + (res.elapsed > 0 ? std::to_string(res.elapsed) : "N/A")));
-        addEntry(std::string("Detected threat: " + (res.detected != "" ? res.detected : "N/A")));
+        addEntry(std::string("\t\t\tStatus: SUCCESS\n"));
+        addEntry(std::string("\t\t\tElapsed time: " + (res.elapsed > 0 ? (std::to_string(res.elapsed) + "\u00b5s\n") : "N/A\n")));
+        addEntry(std::string("\t\t\tDetected threat: " + (res.detected != "" ? (res.detected + "\n") : "N/A\n")));
     }
-    else addEntry(std::string("Status: FAILED"));
+    if(res.status == 0) addEntry(std::string("\t\t\tStatus: FAILED\n"));
 
-    addEntry("");
+    addEntry("\n");
 }
 
 void Log::addBriefSummary(std::list<Test> &tests)
 {
     Results res;
 
-    addEntry("TEST SUMMARY");
-    addEntry("");
-    addEntry("");
+    addEntry("TEST SUMMARY\n");
+    addEntry("\n");
     
     for(auto t : tests)
     {
         res = t.getResult();
-        addEntry(std::string("\t\t"+t.getId()+"("+t.getType()+"): "+(res.status==0?"FAILED":"SUCCESS")));
-        addEntry("");
+        if(res.status == 0) addEntry(std::string("\t\t\t"+t.getId()+" ("+t.getType()+"): FAILED\n"));
+        if(res.status == 1) addEntry(std::string("\t\t\t"+t.getId()+" ("+t.getType()+"): SUCCESS\n"));
     }
 }
 
 void Log::printToLog()
 {
+    addEntry("\n");
     addEntry("### END OF TEST CASE ###");
     
     std::ofstream logfile(path);
@@ -72,7 +72,7 @@ std::string Log::generateLogName()
     std::string filename = "/logs/test_";
 
     std::chrono::time_point<clock_c> datetime = clock_c::now();
-    filename += std::format("%Y%m%d%H%M%S", datetime);
+    filename += std::format("{:%Y%m%d_%H%M%S}", floor<std::chrono::seconds>(datetime));
 
     return filename + ".log";
 }

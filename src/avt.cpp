@@ -35,7 +35,17 @@ int main(int argc, char *argv[])
         std::cout << "Too few arguments. Use \"-h\" or \"--help\" to learn more.";
         return 1;
     }
-    
+    if(std::string(argv[1]) != "0" && std::string(argv[1]) != "1")
+    {
+        std::cout << "\nIncorrect parameter for: performance";
+        return 1;
+    }
+    if(std::string(argv[2]) != "0" && std::string(argv[2]) != "1")
+    {
+        std::cout << "\nIncorrect parameter for: accuracy";
+        return 1;
+    }    
+
     std::shared_ptr<AVType> avtype;
     Preprocessor prep = Preprocessor();
     Tester tester;
@@ -52,7 +62,7 @@ int main(int argc, char *argv[])
             testnames.emplace_back(argv[i]);
         
         tests = prep.prepareTests(testnames);
-        tester = Tester(std::string(argv[1]), std::string(argv[2]), avtype);
+        tester = Tester(argv[1], argv[2], avtype);
     }
     catch(const std::exception& e)
     {
