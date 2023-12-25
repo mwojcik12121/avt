@@ -6,7 +6,7 @@
 
 #include "Log.hpp"
 
-using clock = std::chrono::system_clock;
+using clock_c = std::chrono::system_clock;
 
 Log::Log()
 {
@@ -17,14 +17,13 @@ Log::Log()
 
 std::string Log::getTimestamp()
 {
-    std::chrono::time_point<clock> datetime = clock::now();
+    std::chrono::time_point<clock_c> datetime = clock_c::now();
     return std::format("[ %Y-%m-%d %H:%M:%S ] ", datetime);
 }
 
 void Log::addEntry(std::string entry)
 {
     std::string line = getTimestamp() + entry;
-    std::cout << line << std::endl;
     entries.emplace_back(line);
 }
 
@@ -36,8 +35,8 @@ void Log::addSummary(Test &test)
     if(res.status != 0)
     {
         addEntry(std::string("Status: SUCCESS"));
-        addEntry(std::string("Elapsed time: " + res.elapsed > 0 ? std::to_string(res.elapsed) : "N/A"));
-        addEntry(std::string("Detected threat: " + res.detected != "" ? res.detected : "N/A"));
+        addEntry(std::string("Elapsed time: " + (res.elapsed > 0 ? std::to_string(res.elapsed) : "N/A")));
+        addEntry(std::string("Detected threat: " + (res.detected != "" ? res.detected : "N/A")));
     }
     else addEntry(std::string("Status: FAILED"));
 
@@ -72,7 +71,7 @@ std::string Log::generateLogName()
 {
     std::string filename = "/logs/test_";
 
-    std::chrono::time_point<clock> datetime = clock::now();
+    std::chrono::time_point<clock_c> datetime = clock_c::now();
     filename += std::format("%Y%m%d%H%M%S", datetime);
 
     return filename + ".log";

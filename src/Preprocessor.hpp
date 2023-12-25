@@ -14,8 +14,7 @@ class Preprocessor
     bool validateLine(int index, std::string line);
 
 public:
-    Preprocessor() = default;
-    Preprocessor(std::string dir);
+    Preprocessor();
     ~Preprocessor() = default;
 
     std::list<Test> prepareTests(std::list<std::string> &testnames);

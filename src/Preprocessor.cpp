@@ -25,21 +25,20 @@ std::list<Test> Preprocessor::prepareTests(std::list<std::string> &testnames)
         {
             unpackTarInfo(testfile);
 
-            if(std::filesystem::exists(std::string(".workspace/" + filename)) &&
-                std::filesystem::exists(std::string(".workspace/" + filename + ".info")))
+            if(std::filesystem::exists(std::string(".workspace/" + filename + ".info")))
             {
                 Test current;
                 if(importTest(std::string(".workspace/" + filename + ".info"), current))
                     testlist.emplace_back(current);
-                else std::cout << testfile << ": Invalid info file format! Test has been skipped.";
+                else std::cout << testfile << ": Invalid info file format! Test has been skipped.\n";
             }
-            else std::cout << testfile << ": Invalid info file format! Test has been skipped.";
+            else std::cout << testfile << ": Invalid info file format! Test has been skipped.\n";
         }
-        else std::cout << testfile << ": Invalid info file format! Test has been skipped.";
+        else std::cout << testfile << ": Invalid info file format! Test has been skipped.\n";
     }
 
     if(testlist.empty())
-        throw("No valid tests detected in " + directory);
+        throw std::length_error("\nNo valid tests detected in " + directory);
 
     return testlist;
 }
@@ -102,6 +101,7 @@ bool Preprocessor::validateLine(int index, std::string line)
         default:
             break;
     }
+    return true;
 }
 
 std::shared_ptr<AVType> Preprocessor::getAVType()
@@ -124,8 +124,8 @@ std::shared_ptr<AVType> Preprocessor::getAVType()
     
     for(int i=0; i<3; i++) if(av[i]) av_count++;
 
-    if(av_count > 1) throw("More than one antivirus software detected! Please, make sure all additional antivirus software and its logs are deleted from your device");
-    else if(av_count < 1) throw("No compatible antivirus software detected!");
+    if(av_count > 1) throw std::invalid_argument("\nMore than one antivirus software detected! Please, make sure all additional antivirus software and its logs are deleted from your device");
+    else if(av_count < 1) std::invalid_argument("\nNo compatible antivirus software detected!");
     else
     {
         std::shared_ptr<AVType> avtype;

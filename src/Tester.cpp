@@ -5,10 +5,10 @@
 Tester::Tester(std::string perftest, std::string acctest, std::shared_ptr<AVType> av)
 {
     if(perftest != "0" || perftest != "1")
-        throw("Incorrect parameter for: doPerformanceTest");
+        throw std::invalid_argument("\nIncorrect parameter for: doPerformanceTest");
 
     if(acctest != "0" || acctest != "1")
-        throw("Incorrect parameter for: doAccuracyTest");
+        throw std::invalid_argument("\nIncorrect parameter for: doAccuracyTest");
 
     do_acctest = std::stoi(acctest);
     do_perftest = std::stoi(perftest);

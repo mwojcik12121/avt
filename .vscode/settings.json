@@ -67,5 +67,6 @@
         "xtree": "cpp",
         "regex": "cpp",
         "fstream": "cpp"
-    }
+    },
+    "cmake.configureOnOpen": true
 }

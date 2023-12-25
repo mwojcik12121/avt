@@ -6,8 +6,8 @@ struct AVType
 {
     std::string logpath;
 
-    virtual int executeTest(std::string testfile);
-    virtual std::string verifyAVLog();
+    virtual int executeTest(std::string testfile) = 0;
+    virtual std::string verifyAVLog() = 0;
 };
 
 struct ClamAV : AVType
