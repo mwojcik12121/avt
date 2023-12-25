@@ -1,4 +1,5 @@
 #include <filesystem>
+#include <iostream>
 
 #include "Tester.hpp"
 
@@ -22,6 +23,8 @@ void Tester::performTests(std::list<Test>& tests)
         it.executeTest(do_perftest, do_acctest, avtype);
         log.addEntry(std::string("Test " + it.getId() + " has been completed.\n"));
         log.addEntry("\n");
+        Results res = it.getResult();
+        std::cout << res.status << std::endl;
         if(do_perftest || do_acctest) log.addSummary(it);
         log.addEntry("\n");
     }

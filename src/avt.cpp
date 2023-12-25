@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
     tester.performTests(tests);
 
     // usun przestrzen robocza
-    system("rm -rf .workspace");
+    //system("rm -rf .workspace");
     
     return 0;
 }

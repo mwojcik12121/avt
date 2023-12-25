@@ -1,5 +1,6 @@
 #include <filesystem>
 #include <fstream>
+#include <iostream>
 
 #include "AVType.hpp"
 
@@ -7,7 +8,7 @@ int ClamAV::executeTest(std::string id)
 {
     system(std::string("tar -xvf testfiles/" + id + ".tar -C .workspace " + id).c_str());
     system(std::string("clamscan --quiet -l" + logpath + " .workspace/" + id).c_str());
-    if(verifyAVLog(std::string(logpath)) != "") return 1;
+    if(verifyAVLog(std::string(".workspace/" + id)) != "") return 1;
     else return 0;
 }
 
@@ -19,14 +20,11 @@ std::string ClamAV::verifyAVLog(std::string testpath)
     while(!log.eof())
     {
         log >> line;
-        if(line.find(testpath))
+        size_t found = line.find(testpath);
+        if(found != std::string::npos)
         {
-            std::istringstream iss(line);
-            std::string token;
-
-            while(iss >> token)
-                if (!token.empty() && token != "FOUND" && !token.find(':'))
-                    return token;
+            log >> line;
+            return line;
         }
     }
     

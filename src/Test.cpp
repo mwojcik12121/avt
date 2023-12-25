@@ -19,12 +19,14 @@ void Test::executeTest(const bool doPerf, const bool doAcc, std::shared_ptr<AVTy
 
     if(doPerf) begin = stopwatch::now();
 
-    result.status = avtype->executeTest(std::string(id));
-    if(doAcc) result.detected = avtype->verifyAVLog(std::string(".workspace/" + id));
+    int retval = avtype->executeTest(std::string(id));
+    result.status = retval;
 
     if(doPerf)
     {
         end = stopwatch::now();
-        result.elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+        result.elapsed = std::chrono::duration_cast<std::chrono::seconds>(end - begin).count();
     }
+
+    if(doAcc && retval != 0) result.detected = avtype->verifyAVLog(std::string(".workspace/" + id));
 }

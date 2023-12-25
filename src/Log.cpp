@@ -32,10 +32,10 @@ void Log::addSummary(Test &test)
     Results res = test.getResult();
     
     addEntry(std::string("Test: "+test.getId()+"\n"));
-    if(res.status == 1)
+    if(res.status > 0)
     {
         addEntry(std::string("\t\t\tStatus: SUCCESS\n"));
-        addEntry(std::string("\t\t\tElapsed time: " + (res.elapsed > 0 ? (std::to_string(res.elapsed) + "\u00b5s\n") : "N/A\n")));
+        addEntry(std::string("\t\t\tElapsed time: " + (res.elapsed > 0 ? (std::to_string(res.elapsed) + "ms\n") : "N/A\n")));
         addEntry(std::string("\t\t\tDetected threat: " + (res.detected != "" ? (res.detected + "\n") : "N/A\n")));
     }
     if(res.status == 0) addEntry(std::string("\t\t\tStatus: FAILED\n"));
@@ -54,7 +54,8 @@ void Log::addBriefSummary(std::list<Test> &tests)
     {
         res = t.getResult();
         if(res.status == 0) addEntry(std::string("\t\t\t"+t.getId()+" ("+t.getType()+"): FAILED\n"));
-        if(res.status == 1) addEntry(std::string("\t\t\t"+t.getId()+" ("+t.getType()+"): SUCCESS\n"));
+        if(res.status > 0) addEntry(std::string("\t\t\t"+t.getId()+" ("+t.getType()+"): SUCCESS\n"));
+        if(res.status < 0) addEntry(std::string("\t\t\t"+t.getId()+" ("+t.getType()+"): UNDEFINED\n"));
     }
 }
 
