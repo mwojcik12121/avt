@@ -14,6 +14,7 @@
 
 int main(int argc, char *argv[])
 {
+    // Display help and verify given arguments
     if(argc == 1)
     {
         std::cout << "Welcome to AVT, antivirus test environment! Use \"-h\" or \"--help\" to get started." << std::endl;
@@ -53,7 +54,7 @@ int main(int argc, char *argv[])
     std::list<std::string> testnames;
     std::list<Test> tests;
     
-    // przygotowanie testów i obiektow do wykonywania testow
+    // prepare tests for execution
     try
     {
         avtype = prep.getAVType();
@@ -70,11 +71,11 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    // wykonanie testow antywirusow
+    // perform all declared tests
     tester.performTests(tests);
 
-    // usun przestrzen robocza
-    //system("rm -rf .workspace");
+    // remove .workspace folder
+    system("rm -rf .workspace");
     
     return 0;
 }

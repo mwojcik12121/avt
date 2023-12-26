@@ -45,6 +45,8 @@ void Log::addSummary(Test &test)
 
 void Log::addBriefSummary(std::list<Test> &tests)
 {
+    // TODO: correct incorrectly displayed results
+    
     Results res;
 
     addEntry("TEST SUMMARY\n");

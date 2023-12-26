@@ -124,6 +124,8 @@ std::shared_ptr<AVType> Preprocessor::getAVType()
     }
     else if(av[1])
     {
+        // TODO: find and add log path
+        
         avtype = std::make_shared<DrWeb>();
         avtype->logpath = "";
     }
