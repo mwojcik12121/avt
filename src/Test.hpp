@@ -22,5 +22,5 @@ public:
 
     std::string getId() { return id; }
     std::string getType() { return type; }
-    Results getResult() { return result; }
+    Results& getResult() { return result; }
 };

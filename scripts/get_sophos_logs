@@ -1,0 +1,3 @@
+#!/bin/bash
+touch .workspace/savd.log
+sudo cat /opt/sophos-av/log/savd.log >> .workspace/savd.log

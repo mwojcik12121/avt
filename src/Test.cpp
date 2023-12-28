@@ -17,15 +17,16 @@ void Test::executeTest(const bool doPerf, const bool doAcc, std::shared_ptr<AVTy
     stopwatch::time_point begin;
     stopwatch::time_point end;
 
-    if(doPerf) begin = stopwatch::now();
+    begin = stopwatch::now();
 
     int retval = avtype->executeTest(std::string(id));
     result.status = retval;
 
+    end = stopwatch::now();
+
     if(doPerf)
     {
-        end = stopwatch::now();
-        result.elapsed = std::chrono::duration_cast<std::chrono::seconds>(end - begin).count();
+        result.elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
     }
 
     if(doAcc && retval != 0) result.detected = avtype->verifyAVLog(std::string(".workspace/" + id));

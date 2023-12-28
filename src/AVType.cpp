@@ -6,8 +6,8 @@
 
 int ClamAV::executeTest(std::string id)
 {
-    system(std::string("tar -xvf testfiles/" + id + ".tar -C .workspace " + id).c_str());
-    system(std::string("clamscan --quiet -l" + logpath + " .workspace/" + id).c_str());
+    system(std::string("tar -xvf testfiles/" + id + ".tar -C .workspace " + id + " > /dev/null").c_str());
+    system(std::string("clamscan --quiet -l" + logpath + " .workspace/" + id + " > /dev/null").c_str());
     if(verifyAVLog(std::string(".workspace/" + id)) != "") return 1;
     else return 0;
 }
@@ -17,15 +17,20 @@ std::string ClamAV::verifyAVLog(std::string testpath)
     std::ifstream log(logpath, std::ios::in);
     std::string line;
 
-    while(!log.eof())
+    if(log)
     {
-        log >> line;
-        size_t found = line.find(testpath);
-        if(found != std::string::npos)
+        while(!log.eof())
         {
             log >> line;
-            return line;
+            size_t found = line.find(testpath);
+            if(found != std::string::npos)
+            {
+                log >> line;
+                return line;
+            }
         }
+
+        return "Not found";
     }
     
     return "";
@@ -35,9 +40,9 @@ int DrWeb::executeTest(std::string id)
 {
     // WIP: to be modified
     
-    system(std::string("tar -xvf testfiles/" + id + ".tar -C .workspace " + id).c_str());
+    system(std::string("tar -xvf testfiles/" + id + ".tar -C .workspace " + id + " > /dev/null").c_str());
     if(!std::filesystem::exists(std::string(std::filesystem::current_path().string()+"/.workspace/" + id))) return 1;
-    else return system(std::string(std::filesystem::current_path().string()+"/.workspace/" + id).c_str());
+    else return system(std::string(std::filesystem::current_path().string()+"/.workspace/" + id + " > /dev/null").c_str());
     return 0;
 }
 
@@ -50,24 +55,28 @@ std::string DrWeb::verifyAVLog(std::string testpath)
 
 int Sophos::executeTest(std::string id)
 {
-    // WIP: to be modified
-    
-    system(std::string("tar -xvf testfiles/" + id + ".tar -C .workspace " + id).c_str());
+    system(std::string("tar -xvf testfiles/" + id + ".tar -C .workspace " + id + " > /dev/null").c_str());
     if(!std::filesystem::exists(std::string(std::filesystem::current_path().string()+"/.workspace/" + id))) return 1;
-    else return system(std::string(std::filesystem::current_path().string()+"/.workspace/" + id).c_str());
-    return 0;
+    int retval = system(std::string(std::filesystem::current_path().string()+"/.workspace/" + id + " > /dev/null").c_str());
+    return retval;
 }
 
 std::string Sophos::verifyAVLog(std::string testpath)
 {
-    // WIP - can produce bad results
+    system(std::string("./scripts/get_sophos_logs").c_str());
     
-    std::ifstream log(logpath, std::ios::in);
-    std::string line = "", detected = "";
+    std::ifstream log(".workspace/savd.log", std::ios::in);
+    std::string line = "", detected = "", tmp = "";
 
-    do
+    if(log)
     {
-        if(log.eof())
+        while(!log.eof())
+        {
+            std::getline(log, tmp);
+            if(!tmp.empty()) line = tmp;
+        }
+
+        if(!line.empty())
         {
             size_t found = line.find(testpath);
             if(found != std::string::npos)
@@ -75,11 +84,10 @@ std::string Sophos::verifyAVLog(std::string testpath)
                 for(int i=found+testpath.length()+11; line[i] != '<'; i++) detected += line[i];
                 return detected;
             }
-            return "";
         }
-        std::getline(log, line);
+        
+        return "Not found";
     }
-    while(!log.eof());
     
     return "";
 }

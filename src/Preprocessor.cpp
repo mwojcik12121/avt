@@ -79,10 +79,10 @@ bool Preprocessor::importTest(std::string file, Test &test)
 void Preprocessor::unpackTarInfo(std::string filepath)
 {
     if(!std::filesystem::is_directory(std::string(std::filesystem::current_path().string()+"/.workspace")))
-        system("mkdir .workspace");
+        system("mkdir -m 755 .workspace");
 
     std::filesystem::path file = std::filesystem::path(filepath);
-    system(std::string("tar -xvf ./testfiles/" + filepath + " -C .workspace " + file.stem().string() + ".info").c_str());
+    system(std::string("tar -xvf ./testfiles/" + filepath + " -C .workspace " + file.stem().string() + ".info > /dev/null").c_str());
 }
 
 bool Preprocessor::validateLine(int index, std::string line)

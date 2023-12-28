@@ -36,6 +36,7 @@ void Log::addSummary(Test &test)
     {
         addEntry(std::string("\t\t\tStatus: SUCCESS\n"));
         addEntry(std::string("\t\t\tElapsed time: " + (res.elapsed > 0 ? (std::to_string(res.elapsed) + "ms\n") : "N/A\n")));
+        addEntry(std::string("\t\t\tExpected threat: " + test.getType() + "\n"));
         addEntry(std::string("\t\t\tDetected threat: " + (res.detected != "" ? (res.detected + "\n") : "N/A\n")));
     }
     if(res.status == 0) addEntry(std::string("\t\t\tStatus: FAILED\n"));
@@ -45,19 +46,14 @@ void Log::addSummary(Test &test)
 
 void Log::addBriefSummary(std::list<Test> &tests)
 {
-    // TODO: correct incorrectly displayed results
-    
-    Results res;
-
     addEntry("TEST SUMMARY\n");
     addEntry("\n");
     
     for(auto t : tests)
     {
-        res = t.getResult();
-        if(res.status == 0) addEntry(std::string("\t\t\t"+t.getId()+" ("+t.getType()+"): FAILED\n"));
-        if(res.status > 0) addEntry(std::string("\t\t\t"+t.getId()+" ("+t.getType()+"): SUCCESS\n"));
-        if(res.status < 0) addEntry(std::string("\t\t\t"+t.getId()+" ("+t.getType()+"): UNDEFINED\n"));
+        if(t.getResult().status == 0) addEntry(std::string("\t\t\t"+t.getId()+" ("+t.getType()+"): FAILED\n"));
+        else if(t.getResult().status > 0) addEntry(std::string("\t\t\t"+t.getId()+" ("+t.getType()+"): SUCCESS\n"));
+        else addEntry(std::string("\t\t\t"+t.getId()+" ("+t.getType()+"): UNDEFINED\n"));
     }
 }
 
@@ -67,6 +63,13 @@ void Log::printToLog()
     addEntry("### END OF TEST CASE ###");
     
     std::ofstream logfile(path);
+
+    std::filesystem::permissions(
+        path,
+        std::filesystem::perms::owner_all | std::filesystem::perms::group_all,
+        std::filesystem::perm_options::add
+    );
+
     for (auto ent : entries) logfile << ent;
 }
 

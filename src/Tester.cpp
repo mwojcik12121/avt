@@ -17,7 +17,7 @@ void Tester::performTests(std::list<Test>& tests)
     log.addEntry("\n");
     log.addEntry("\n");
     
-    for(auto it : tests)
+    for(auto& it : tests)
     {
         log.addEntry(std::string("Test " + it.getId() + " in progress...\n"));
         it.executeTest(do_perftest, do_acctest, avtype);

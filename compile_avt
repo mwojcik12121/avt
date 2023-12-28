@@ -1,2 +1,0 @@
-#!/bin/sh
-g++ -std=c++20 -Iinclude src/AVType.cpp src/Log.cpp src/Preprocessor.cpp src/Test.cpp src/Tester.cpp -o avt src/avt.cpp
