@@ -16,7 +16,7 @@ void Tester::performTests(std::list<Test>& tests)
     log.addEntry("Activating tests...\n");
     log.addEntry("\n");
     log.addEntry("\n");
-    
+
     for(auto& it : tests)
     {
         log.addEntry(std::string("Test " + it.getId() + " in progress...\n"));

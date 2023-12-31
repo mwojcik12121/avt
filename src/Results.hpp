@@ -4,7 +4,7 @@
 
 struct Results
 {
-    int status = -1;
+    int status;
     int elapsed = -1;
     std::string detected = "";
 };

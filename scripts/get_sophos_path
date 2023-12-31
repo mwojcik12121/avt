@@ -1,0 +1,2 @@
+#!/bin/bash
+sudo find / -path \*/sophos-\*/log/savd.log >> .workspace/sophos.path 2> /dev/null

@@ -20,19 +20,28 @@ std::list<Test> Preprocessor::prepareTests(std::list<std::string> &testnames)
         std::string testfile = entry.path().filename().string();
         std::string filename = entry.path().stem().string();
 
-        if(std::find(testnames.begin(), testnames.end(), filename) != testnames.end() &&
-            std::regex_match(testfile, std::regex("[A-Z]{2}-[0-9]{4}.tar")))
+        try
         {
-            unpackTarInfo(testfile);
-
-            if(std::filesystem::exists(std::string(".workspace/" + filename + ".info")))
+            if(std::find(testnames.begin(), testnames.end(), filename) != testnames.end() &&
+                std::regex_match(testfile, std::regex("[A-Z]{2}-[0-9]{4}\.tar")))
             {
-                Test current;
-                if(importTest(std::string(".workspace/" + filename + ".info"), current))
-                    testlist.emplace_back(current);
-                else std::cout << testfile << ": Invalid info file format! Test has been skipped.\n";
+                unpackTarInfo(testfile);
+
+                if(std::filesystem::exists(std::string(".workspace/" + filename + ".info")))
+                {
+                    Test current;
+                    if(importTest(std::string(".workspace/" + filename + ".info"), current))
+                        testlist.emplace_back(current);
+                    else throw std::runtime_error("Invalid .info file format!");
+                }
+                else throw std::runtime_error("Could not find .info file!");
             }
-            else std::cout << testfile << ": Invalid info file format! Test has been skipped.\n";
+            else std::cout << testfile << ": Skipping test..." << std::endl;
+        }
+        catch(const std::exception& e)
+        {
+            std::cerr << e.what() << std::endl;
+            std::cout << testfile << ": Skipping test..." << std::endl;
         }
     }
 
@@ -49,23 +58,22 @@ bool Preprocessor::importTest(std::string file, Test &test)
 
     std::ifstream filestream(file, std::ifstream::in);
 
+    if(!filestream) throw std::runtime_error("Could not open .info file!");
+
     while(!filestream.eof())
     {
         if(getline_it>2) break;
 
         filestream >> line;
-
         if(!validateLine(getline_it, line))
             return false;
 
         switch(getline_it)
         {
             case 1:
-                id = line;
-                break;
+                id = line; break;
             case 2:
-                type = line;
-                break;
+                type = line; break;
             default:
                 break;
         }
@@ -78,11 +86,10 @@ bool Preprocessor::importTest(std::string file, Test &test)
 
 void Preprocessor::unpackTarInfo(std::string filepath)
 {
-    if(!std::filesystem::is_directory(std::string(std::filesystem::current_path().string()+"/.workspace")))
-        system("mkdir -m 755 .workspace");
-
     std::filesystem::path file = std::filesystem::path(filepath);
-    system(std::string("tar -xvf ./testfiles/" + filepath + " -C .workspace " + file.stem().string() + ".info > /dev/null").c_str());
+    int retval = system(std::string("tar -xvf ./testfiles/" + filepath + " -C .workspace " +
+                        file.stem().string() + ".info > /dev/null 2> /dev/null").c_str());
+    if (retval != 0) throw std::runtime_error("Could not extract .info file!");
 }
 
 bool Preprocessor::validateLine(int index, std::string line)
@@ -90,11 +97,9 @@ bool Preprocessor::validateLine(int index, std::string line)
     switch(index)
     {
         case 0:
-            return line == "#TEST#";
-            break;
+            return line == "#TEST#"; break;
         case 1:
-            return std::regex_match(line, std::regex("[A-Z]{2}-[0-9]{4}"));
-            break;
+            return std::regex_match(line, std::regex("[A-Z]{2}-[0-9]{4}")); break;
         default:
             break;
     }
@@ -107,13 +112,32 @@ std::shared_ptr<AVType> Preprocessor::getAVType()
     int av_count = 0;
 
     if(std::filesystem::exists("/var/log/clamav/clamav.log")) av[0] = 1;
-    if(std::filesystem::exists("")) av[1] = 1;
-    if(std::filesystem::exists("/opt/sophos-av/log/savd.log")) av[2] = 1;
+
+    system("find / -path \*/.com.drweb.quarantine >> .workspace/drweb.path 2> /dev/null");
+
+    std::ifstream drweb(".workspace/drweb.path");
+    std::string dpath = "";
+
+    if(drweb.peek() != std::ifstream::traits_type::eof())
+    {
+        drweb >> dpath;
+        if(std::filesystem::exists(dpath)) av[1] = 1;
+    }
+    if(std::filesystem::exists("/.com.drweb.quarantine")) av[1] = 1;
+
+    system("./scripts/get_sophos_path");
+    std::ifstream sophos(".workspace/sophos.path");
+    std::string spath = "";
+    if(sophos.peek() != std::ifstream::traits_type::eof())
+    {
+        sophos >> spath;
+        if(std::filesystem::exists(spath)) av[2] = 1;
+    }
     
     for(int i=0; i<3; i++) if(av[i]) av_count++;
 
     if(av_count > 1) throw std::invalid_argument("\nMore than one antivirus software detected! Please, make sure all additional antivirus software and its logs are deleted from your device");
-    else if(av_count < 1) std::invalid_argument("\nNo compatible antivirus software detected!");
+    else if(av_count < 1) throw std::invalid_argument("\nNo compatible antivirus software detected!");
     
     std::shared_ptr<AVType> avtype;
 
@@ -124,15 +148,13 @@ std::shared_ptr<AVType> Preprocessor::getAVType()
     }
     else if(av[1])
     {
-        // TODO: find and add log path
-        
         avtype = std::make_shared<DrWeb>();
-        avtype->logpath = "";
+        avtype->logpath = dpath;
     }
     else if(av[2])
     {
         avtype = std::make_shared<Sophos>();
-        avtype->logpath = "/opt/sophos-av/log/savd.log";
+        avtype->logpath = spath;
     }
     return avtype;
 }

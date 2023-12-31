@@ -1,3 +1,4 @@
+#include <filesystem>
 #include <iostream>
 #include <list>
 
@@ -23,15 +24,15 @@ int main(int argc, char *argv[])
     if(argc == 2 && (std::string(argv[1]) == "--help" || std::string(argv[1]) == "-h"))
     {
         std::cout << "Welcome to AVT, antivirus test environment!" << std::endl << std::endl;
-        std::cout << "Syntax: ./avt [performance] [accuracy] [tests]" << std::endl << std::endl;
+        std::cout << "Syntax: ./avt [performance] [accuracy] [tests (optional)]" << std::endl << std::endl;
         std::cout << "[performance] - if performance test should be included in the program. Values: 0, 1" << std::endl;
         std::cout << "[accuracy] - if accuracy test should be included in the program. Values: 0, 1" << std::endl;
-        std::cout << "[tests] - tests that should be done, separated by whitespace. Example: AD-6969 SP-4780" << std::endl << std::endl;
+        std::cout << "[tests] - tests that should be done, separated by whitespace. Leave emply for check all tests in the folder. Example: AD-6969 SP-4780" << std::endl << std::endl;
         std::cout << "Make sure all listed tests are placed in \"testfiles\" folder" << std::endl << std::endl;
         std::cout << "Compatible with: ClamAV, DrWeb, Sophos" << std::endl << std::endl;
         return 0;
     }
-    if(argc < 4)
+    if(argc < 3)
     {
         std::cout << "Too few arguments. Use \"-h\" or \"--help\" to learn more.";
         return 1;
@@ -57,17 +58,24 @@ int main(int argc, char *argv[])
     // prepare tests for execution
     try
     {
+        system("mkdir .workspace");
         avtype = prep.getAVType();
         
-        for(int i = 3; i < argc; i++)
-            testnames.emplace_back(argv[i]);
+        if(argc == 3)
+        {
+            for(const auto & entry : std::filesystem::directory_iterator("testfiles"))
+                if(entry.path().stem().string() != "README.md") testnames.emplace_back(entry.path().stem().string());
+        }  
+        else for(int i = 3; i < argc; i++) testnames.emplace_back(argv[i]);
         
         tests = prep.prepareTests(testnames);
+        system("rm -rf .workspace");
         tester = Tester(argv[1], argv[2], avtype);
     }
     catch(const std::exception& e)
     {
         std::cerr << e.what() << '\n';
+        system("rm -rf .workspace");
         return 1;
     }
 
