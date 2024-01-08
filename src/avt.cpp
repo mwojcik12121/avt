@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
         if(argc == 3)
         {
             for(const auto & entry : std::filesystem::directory_iterator("testfiles"))
-                if(entry.path().stem().string() != "README.md") testnames.emplace_back(entry.path().stem().string());
+                testnames.emplace_back(entry.path().stem().string());
         }  
         else for(int i = 3; i < argc; i++) testnames.emplace_back(argv[i]);
         

@@ -26,7 +26,11 @@ void Test::executeTest(const bool doPerf, const bool doAcc, std::shared_ptr<AVTy
     end = stopwatch::now();
 
     if(doPerf) result.elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
-    if(doAcc && retval != 0) result.detected = avtype->verifyAVLog(std::string(".workspace/" + id));
+
+    std::string detected = avtype->verifyAVLog(std::string(".workspace/" + id));
+    
+    if(doAcc && retval != 0) result.detected = detected;
+    if(detected == "" || detected == "Not found") result.status = 0;
 
     system("rm -rf .workspace");
 }

@@ -15,6 +15,12 @@ Log::Log()
     addEntry("\n");
 }
 
+std::string adjustTimeUnits(int elapsed)
+{
+    if(elapsed >= 1000) return std::string(elapsed/1000 + "s");
+    else return std::string(elapsed + "ms");
+}
+
 std::string Log::getTimestamp()
 {
     std::chrono::time_point<clock_c> datetime = clock_c::now();
@@ -32,14 +38,14 @@ void Log::addSummary(Test &test)
     Results res = test.getResult();
     
     addEntry(std::string("Test: "+test.getId()+"\n"));
-    if(res.status > 0)
+    if(res.status != 0)
     {
         addEntry(std::string("\t\t\tStatus: SUCCESS\n"));
         addEntry(std::string("\t\t\tElapsed time: " + (res.elapsed > 0 ? (std::to_string(res.elapsed) + "ms\n") : "N/A\n")));
         addEntry(std::string("\t\t\tExpected threat: " + test.getType() + "\n"));
         addEntry(std::string("\t\t\tDetected threat: " + (res.detected != "" ? (res.detected + "\n") : "N/A\n")));
     }
-    if(res.status == 0) addEntry(std::string("\t\t\tStatus: FAILED\n"));
+    else addEntry(std::string("\t\t\tStatus: FAILED\n"));
 
     addEntry("\n");
 }

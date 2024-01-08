@@ -2,12 +2,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
-#include <regex>
 #include <thread>
-
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <unistd.h>
 
 #include "AVType.hpp"
 
@@ -63,19 +58,26 @@ std::string ClamAV::verifyAVLog(std::string testpath)
 
 int DrWeb::executeTest(std::string id)
 {
+    system(std::string("tar -xvf testfiles/" + id + ".tar -C .workspace " + id + " > /dev/null").c_str());
+    std::this_thread::sleep_for(std::chrono::milliseconds(250));
+
+    if(!std::filesystem::exists(std::string(std::filesystem::current_path().string()+"/.workspace/" + id))) return 1;
+    else
+    {
+        std::cout<<"Test "<<id<<" is being executed. Please interrupt program with combination CTRL+C if necessary."<<std::endl;
+        int retval = system(std::string(std::filesystem::current_path().string()+"/.workspace/" + id + " > /dev/null 2> /dev/null").c_str());
+        std::cout<<id<<": execution stopped"<<std::endl;
+
+        return retval;
+    }
     
-    
-    // system(std::string("tar -xvf testfiles/" + id + ".tar -C .workspace " + id + " > /dev/null").c_str());
-    // std::this_thread::sleep_for(std::chrono::milliseconds(250));
-    // if(!std::filesystem::exists(std::string(std::filesystem::current_path().string()+"/.workspace/" + id))) return 1;
-    // int retval = system(std::string(std::filesystem::current_path().string()+"/.workspace/" + id + " > /dev/null").c_str());
-    // return retval;
     return 0;
 }
 
 std::string DrWeb::verifyAVLog(std::string testpath)
 {
-    system(std::string("ls -t " + logpath + "/*.i2 | head -n1 >> .workspace/newest").c_str());
+    system(std::string("ls -t " + logpath + "/*.i2 2> /dev/null | head -n1 >> .workspace/newest").c_str());
+
     std::ifstream drweblog(".workspace/newest", std::ios::in | std::ios::binary);
     std::string lpath = "";
     while(!drweblog.eof()) drweblog >> lpath;
@@ -103,6 +105,7 @@ std::string DrWeb::verifyAVLog(std::string testpath)
                     detected += line[i];
                     if(line[i+1] == 'X' && line[i+3] == 'r') break;
                 }
+                system(std::string("rm " + lpath).c_str());
                 return detected;
             }
         }
@@ -114,9 +117,18 @@ std::string DrWeb::verifyAVLog(std::string testpath)
 int Sophos::executeTest(std::string id)
 {
     system(std::string("tar -xvf testfiles/" + id + ".tar -C .workspace " + id + " > /dev/null").c_str());
+
     if(!std::filesystem::exists(std::string(std::filesystem::current_path().string()+"/.workspace/" + id))) return 1;
-    int retval = system(std::string(std::filesystem::current_path().string()+"/.workspace/" + id + " > /dev/null").c_str());
-    return retval;
+    else
+    {
+        std::cout<<"Test "<<id<<" is being executed. Please interrupt program with combination CTRL+C if necessary."<<std::endl;
+        int retval = system(std::string(std::filesystem::current_path().string()+"/.workspace/" + id + " > /dev/null 2> /dev/null").c_str());
+        std::cout<<id<<": execution stopped"<<std::endl;
+
+        return retval;
+    }
+
+    return 0;
 }
 
 std::string Sophos::verifyAVLog(std::string testpath)

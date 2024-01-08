@@ -9,6 +9,7 @@ class Log
     std::string path;
     std::list<std::string> entries;
 
+    std::string adjustTimeUnits();
     std::string generateLogName();
     std::string getTimestamp();
 

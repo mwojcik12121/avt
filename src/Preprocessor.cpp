@@ -20,6 +20,8 @@ std::list<Test> Preprocessor::prepareTests(std::list<std::string> &testnames)
         std::string testfile = entry.path().filename().string();
         std::string filename = entry.path().stem().string();
 
+        if(testfile == "README.md") continue;
+
         try
         {
             if(std::find(testnames.begin(), testnames.end(), filename) != testnames.end() &&
@@ -36,7 +38,11 @@ std::list<Test> Preprocessor::prepareTests(std::list<std::string> &testnames)
                 }
                 else throw std::runtime_error("Could not find .info file!");
             }
-            else std::cout << testfile << ": Skipping test..." << std::endl;
+            else
+            {
+                if(std::find(testnames.begin(), testnames.end(), filename) == testnames.end()) continue;
+                else std::cout << testfile << ": Skipping test..." << std::endl;
+            }
         }
         catch(const std::exception& e)
         {
