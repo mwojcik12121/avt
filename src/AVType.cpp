@@ -8,12 +8,14 @@
 
 int ClamAV::executeTest(std::string id)
 {
+    // Wypakowywanie oraz skanowanie pliku testowego
     system(std::string("tar -xvf testfiles/" + id + ".tar -C .workspace " + id + " > /dev/null").c_str());
     system(std::string("clamscan --quiet -l " + logpath + " .workspace/" + id + " > /dev/null").c_str());
     
     std::string line = "";
     std::ifstream clamlog(logpath);
 
+    // Zweryfikuj czy ClamAV wykryl zagrozenie
     if(clamlog)
     {
         while(!clamlog.eof())
@@ -39,6 +41,7 @@ std::string ClamAV::verifyAVLog(std::string testpath)
     std::ifstream log(logpath, std::ios::in);
     std::string line;
 
+    // Analizuj tekst raportu
     if(log)
     {
         while(!log.eof())

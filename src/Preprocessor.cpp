@@ -24,11 +24,14 @@ std::list<Test> Preprocessor::prepareTests(std::list<std::string> &testnames)
 
         try
         {
+            // Sprawdzanie formatu nazwy archiwum oraz czy istnieje w folderze testfiles
             if(std::find(testnames.begin(), testnames.end(), filename) != testnames.end() &&
                 std::regex_match(testfile, std::regex("[A-Z]{2}-[0-9]{4}\.tar")))
             {
+                // Wypakuj plik informacyjny
                 unpackTarInfo(testfile);
 
+                // Dodaj test do listy testow do wykonania
                 if(std::filesystem::exists(std::string(".workspace/" + filename + ".info")))
                 {
                     Test current;
@@ -92,6 +95,7 @@ bool Preprocessor::importTest(std::string file, Test &test)
 
 void Preprocessor::unpackTarInfo(std::string filepath)
 {
+    // Wypakuj plik informacyjny z archiwum testu
     std::filesystem::path file = std::filesystem::path(filepath);
     int retval = system(std::string("tar -xvf ./testfiles/" + filepath + " -C .workspace " +
                         file.stem().string() + ".info > /dev/null 2> /dev/null").c_str());
@@ -114,16 +118,16 @@ bool Preprocessor::validateLine(int index, std::string line)
 
 std::shared_ptr<AVType> Preprocessor::getAVType()
 {
-    bool av[3] = {0};
+    bool av[3] = {0};       // av[0] - ClamAV, av[1] - DrWeb, av[2] - Sophos
     int av_count = 0;
 
+    // Sprawdz czy istnieje plik programu ClamAV
     if(std::filesystem::exists("/var/log/clamav/clamav.log")) av[0] = 1;
 
+    // Sprawdz czy istnieje folder programu DrWeb
     system("find / -path \*/.com.drweb.quarantine >> .workspace/drweb.path 2> /dev/null");
-
     std::ifstream drweb(".workspace/drweb.path");
     std::string dpath = "";
-
     if(drweb.peek() != std::ifstream::traits_type::eof())
     {
         drweb >> dpath;
@@ -131,6 +135,7 @@ std::shared_ptr<AVType> Preprocessor::getAVType()
     }
     if(std::filesystem::exists("/.com.drweb.quarantine")) av[1] = 1;
 
+    // Sprawdz czy istnieje plik programu Sophos
     system("./scripts/get_sophos_path");
     std::ifstream sophos(".workspace/sophos.path");
     std::string spath = "";
@@ -147,17 +152,17 @@ std::shared_ptr<AVType> Preprocessor::getAVType()
     
     std::shared_ptr<AVType> avtype;
 
-    if(av[0])
+    if(av[0])       // ClamAV
     {
         avtype = std::make_shared<ClamAV>();
         avtype->logpath = ".workspace/clamav.log";
     }
-    else if(av[1])
+    else if(av[1])  // DrWeb
     {
         avtype = std::make_shared<DrWeb>();
         avtype->logpath = dpath;
     }
-    else if(av[2])
+    else if(av[2])  // Sophos
     {
         avtype = std::make_shared<Sophos>();
         avtype->logpath = spath;

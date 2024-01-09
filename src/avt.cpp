@@ -15,7 +15,7 @@
 
 int main(int argc, char *argv[])
 {
-    // Display help and verify given arguments
+    // Wyswietl pomoc
     if(argc == 1)
     {
         std::cout << "Welcome to AVT, antivirus test environment! Use \"-h\" or \"--help\" to get started." << std::endl;
@@ -32,6 +32,8 @@ int main(int argc, char *argv[])
         std::cout << "Compatible with: ClamAV, DrWeb, Sophos" << std::endl << std::endl;
         return 0;
     }
+
+    // Zweryfikuj poprawnosc argumentow
     if(argc < 3)
     {
         std::cout << "Too few arguments. Use \"-h\" or \"--help\" to learn more.";
@@ -55,7 +57,7 @@ int main(int argc, char *argv[])
     std::list<std::string> testnames;
     std::list<Test> tests;
     
-    // prepare tests for execution
+    // Przygotuj testy
     try
     {
         system("mkdir .workspace");
@@ -79,10 +81,10 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    // perform all declared tests
+    // Wykonaj wszystkie pobrane testy
     tester.performTests(tests);
 
-    // remove .workspace folder
+    // Usun folder .workspace
     system("rm -rf .workspace");
     
     return 0;

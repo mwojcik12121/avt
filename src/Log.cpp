@@ -15,12 +15,6 @@ Log::Log()
     addEntry("\n");
 }
 
-std::string adjustTimeUnits(int elapsed)
-{
-    if(elapsed >= 1000) return std::string(elapsed/1000 + "s");
-    else return std::string(elapsed + "ms");
-}
-
 std::string Log::getTimestamp()
 {
     std::chrono::time_point<clock_c> datetime = clock_c::now();
