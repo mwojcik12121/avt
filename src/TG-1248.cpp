@@ -1,4 +1,5 @@
 #include <string>
+#include <filesystem>
 
 /*
 Tagger - rozmnazajacy sie program
@@ -19,9 +20,10 @@ int main(int argc, char *argv[])
     
     // Utworz i wykonaj kolejny program
     std::string nextfile = "tagger" + std::to_string(next);
-    system(std::string("touch " + nextfile).c_str());
-    system(std::string("cat " + std::string(argv[0]) + " > " + nextfile).c_str());
-    system(std::string("chmod +x " + nextfile).c_str());
-    system(std::string("./" + nextfile + " " + std::to_string(next + 1)).c_str());
+    if(!std::filesystem::exists(".workspace/next")) system("mkdir -p .workspace/next");
+    system(std::string("touch .workspace/next/" + nextfile).c_str());
+    system(std::string("cat " + std::string(argv[0]) + " > .workspace/next/" + nextfile).c_str());
+    system(std::string("chmod +x .workspace/next/" + nextfile).c_str());
+    system(std::string("./.workspace/next/" + nextfile + " " + std::to_string(next + 1)).c_str());
     return 0;
 }
