@@ -1,6 +1,6 @@
 # testfiles
 
-This is a folder where tests should be placed.
+This is a folder where tests should be placed in order to be executed.
 
 Accepted test format:
 
@@ -23,11 +23,9 @@ All performed tests should meet all these HRI criteria:
 * Reversible - tests and all changes that were made during their runtime should be easily reversible!
 * Invisible (outside of test cases) - make sure all created tests will not be removed before they even begin!
 
-Example test has been presented in EX-1234 and contains basic "Hello World!" program.
+Example test has been presented in EX-1234 and contains a simple, harmless program which should not be detected by any compatible antivirus software.
 
-Other tests present different cases of data - invalid format, invalid signature, invalid ID etc. Their characteristics and expected result can be found inside .info file (if present)
-
-Real test cases could not be added on github for security reasons and can be found [here]()
+Other tests present different cases of data - invalid format, invalid signature, invalid ID etc. Their characteristics and expected result can be found inside their designated .info file (if present)
 
 #
 
